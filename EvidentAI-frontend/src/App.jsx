@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 import "./App.css";
 
+// Dynamic API URL check: uses Netlify env variable in production, falls back to local server in dev
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
+
 export default function App() {
   const [sourceDoc, setSourceDoc] = useState("");
   const [llmOutput, setLlmOutput] = useState("");
@@ -67,7 +70,8 @@ export default function App() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/verify", {
+      // Updated fetch URL using API_BASE_URL
+      const res = await fetch(`${API_BASE_URL}/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -76,7 +80,7 @@ export default function App() {
         })
       });
 
-      if (!res.ok) throw new Error("Verification failed");
+      if (!res.ok) throw new Error(`Verification failed with status: ${res.status}`);
       const data = await res.json();
       setReport(data);
     } catch (err) {
